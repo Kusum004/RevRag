@@ -1,0 +1,159 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "AppKnowledgePack",
+  "description": "Structured, deterministic, and compact App Knowledge Pack for RevRag In-App Agent",
+  "type": "object",
+  "required": ["metadata", "design_system", "screen_graph", "screen_profiles"],
+  "properties": {
+    "metadata": {
+      "type": "object",
+      "required": ["package_name", "timestamp", "exploration_engine", "total_screens_discovered", "total_transitions_logged", "pack_size_kb"],
+      "properties": {
+        "package_name": { "type": "string" },
+        "timestamp": { "type": "string" },
+        "exploration_engine": { "type": "string" },
+        "total_screens_discovered": { "type": "integer" },
+        "total_transitions_logged": { "type": "integer" },
+        "pack_size_kb": { "type": "number" },
+        "raw_tree_equivalent_kb": { "type": "number" },
+        "compression_ratio": { "type": "string" }
+      }
+    },
+    "design_system": {
+      "type": "object",
+      "required": ["palette", "typography", "spacing", "tone_of_voice"],
+      "properties": {
+        "palette": {
+          "type": "object",
+          "required": ["primary_accent", "secondary_accent", "background", "surface", "text_primary", "is_dark_mode"],
+          "properties": {
+            "primary_accent": { "type": "string" },
+            "secondary_accent": { "type": "string" },
+            "background": { "type": "string" },
+            "surface": { "type": "string" },
+            "text_primary": { "type": "string" },
+            "text_secondary": { "type": "string" },
+            "is_dark_mode": { "type": "boolean" },
+            "palette_hex_list": { "type": "array", "items": { "type": "string" } }
+          }
+        },
+        "typography": {
+          "type": "object",
+          "properties": {
+            "display_title_height_dp": { "type": "integer" },
+            "heading_height_dp": { "type": "integer" },
+            "body_text_height_dp": { "type": "integer" },
+            "caption_height_dp": { "type": "integer" },
+            "font_family_recommendation": { "type": "string" }
+          }
+        },
+        "spacing": {
+          "type": "object",
+          "properties": {
+            "base_grid_unit_dp": { "type": "integer" },
+            "screen_padding_horizontal_dp": { "type": "integer" },
+            "component_gap_vertical_dp": { "type": "integer" },
+            "border_radius_dp": { "type": "integer" }
+          }
+        },
+        "tone_of_voice": { "type": "string" },
+        "recurring_components": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "component_type": { "type": "string" },
+              "count_across_app": { "type": "integer" },
+              "sample_resource_ids": { "type": "array", "items": { "type": "string" } }
+            }
+          }
+        }
+      }
+    },
+    "screen_graph": {
+      "type": "object",
+      "required": ["nodes", "edges", "entry_node"],
+      "properties": {
+        "entry_node": { "type": "string" },
+        "nodes": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["fingerprint", "screen_name", "category", "purpose"],
+            "properties": {
+              "fingerprint": { "type": "string" },
+              "screen_name": { "type": "string" },
+              "category": { "type": "string" },
+              "purpose": { "type": "string" },
+              "elements_count": { "type": "integer" }
+            }
+          }
+        },
+        "edges": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["from_fingerprint", "to_fingerprint", "action_type"],
+            "properties": {
+              "from_fingerprint": { "type": "string" },
+              "to_fingerprint": { "type": "string" },
+              "action_type": { "type": "string" },
+              "target_element_id": { "type": ["string", "null"] },
+              "reason": { "type": ["string", "null"] }
+            }
+          }
+        },
+        "journeys": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "journey_name": { "type": "string" },
+              "step_count": { "type": "integer" },
+              "screen_sequence": { "type": "array", "items": { "type": "string" } },
+              "description": { "type": "string" }
+            }
+          }
+        }
+      }
+    },
+    "screen_profiles": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "object",
+        "required": ["fingerprint", "screen_name", "purpose", "screen_category", "elements"],
+        "properties": {
+          "fingerprint": { "type": "string" },
+          "screen_name": { "type": "string" },
+          "purpose": { "type": "string" },
+          "screen_category": { "type": "string" },
+          "key_actions": { "type": "array", "items": { "type": "string" } },
+          "elements": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": ["element_id", "role", "plain_description"],
+              "properties": {
+                "element_id": { "type": "string" },
+                "role": { "type": "string" },
+                "plain_description": { "type": "string" },
+                "form_field_type": { "type": ["string", "null"] },
+                "suggested_test_value": { "type": ["string", "null"] },
+                "bounds": {
+                  "type": "object",
+                  "properties": {
+                    "left": { "type": "integer" },
+                    "top": { "type": "integer" },
+                    "right": { "type": "integer" },
+                    "bottom": { "type": "integer" }
+                  }
+                },
+                "text": { "type": ["string", "null"] }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

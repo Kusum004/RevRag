@@ -1,0 +1,21 @@
+{
+  "credentials": {
+    "phone": "9876543210",
+    "otp": "123456",
+    "email": "agent.test@revrag.ai",
+    "password": "ValidPassword123!",
+    "name": "Alex Agent",
+    "pin": "1234"
+  },
+  "kyc_data": {
+    "pan_number": "ABCDE1234F",
+    "aadhaar_last_four": "5678",
+    "dob": "1995-08-15",
+    "address": "123 Startup Park, Koramangala, Bengaluru"
+  },
+  "form_defaults": {
+    "search_query": "Wireless Headphones",
+    "quantity": "1",
+    "zipcode": "560034"
+  }
+}

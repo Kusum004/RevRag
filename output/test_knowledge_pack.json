@@ -1,0 +1,859 @@
+{
+  "metadata": {
+    "package_name": "com.revrag.sampleapp",
+    "timestamp": "2026-09-18 04:00:14 UTC",
+    "exploration_engine": "RevRag-ZeroTouch-v1.0",
+    "total_screens_discovered": 5,
+    "total_transitions_logged": 16,
+    "pack_size_kb": 25.8,
+    "raw_tree_equivalent_kb": 6.97,
+    "compression_ratio": "95.4%"
+  },
+  "design_system": {
+    "palette": {
+      "primary_accent": "#6366f1",
+      "secondary_accent": "#6669f9",
+      "background": "#12141d",
+      "surface": "#1a202c",
+      "text_primary": "#F8FAFC",
+      "text_secondary": "#94A3B8",
+      "is_dark_mode": true,
+      "palette_hex_list": [
+        "#12141d",
+        "#1a202c",
+        "#1a1d29",
+        "#6366f1",
+        "#161b27",
+        "#1f2436",
+        "#12141c",
+        "#1a1e2a"
+      ]
+    },
+    "typography": {
+      "display_title_height_dp": 32,
+      "heading_height_dp": 22,
+      "body_text_height_dp": 16,
+      "caption_height_dp": 12,
+      "font_family_recommendation": "Inter, -apple-system, Roboto, sans-serif"
+    },
+    "spacing": {
+      "base_grid_unit_dp": 8,
+      "screen_padding_horizontal_dp": 24,
+      "component_gap_vertical_dp": 12,
+      "border_radius_dp": 12
+    },
+    "tone_of_voice": "Action-Oriented & Direct | Friendly & Inviting",
+    "recurring_components": [
+      {
+        "component_type": "TextView",
+        "count_across_app": 13,
+        "sample_resource_ids": [
+          "tv_product_price",
+          "tv_product_title",
+          "tv_detail_title",
+          "tv_title"
+        ],
+        "typical_bounds_ratio": 1.0
+      },
+      {
+        "component_type": "Button",
+        "count_across_app": 5,
+        "sample_resource_ids": [
+          "btn_logout",
+          "btn_add_to_cart",
+          "btn_get_started",
+          "btn_login_submit"
+        ],
+        "typical_bounds_ratio": 1.0
+      },
+      {
+        "component_type": "FrameLayout",
+        "count_across_app": 3,
+        "sample_resource_ids": [
+          "nav_cart",
+          "nav_profile",
+          "nav_home"
+        ],
+        "typical_bounds_ratio": 1.0
+      },
+      {
+        "component_type": "EditText",
+        "count_across_app": 3,
+        "sample_resource_ids": [
+          "edit_otp",
+          "edit_phone",
+          "edit_search_bar"
+        ],
+        "typical_bounds_ratio": 1.0
+      },
+      {
+        "component_type": "CardView",
+        "count_across_app": 2,
+        "sample_resource_ids": [
+          "card_product_1",
+          "card_product_2"
+        ],
+        "typical_bounds_ratio": 1.0
+      },
+      {
+        "component_type": "ImageButton",
+        "count_across_app": 2,
+        "sample_resource_ids": [
+          "btn_back_profile",
+          "btn_back"
+        ],
+        "typical_bounds_ratio": 1.0
+      },
+      {
+        "component_type": "ImageView",
+        "count_across_app": 1,
+        "sample_resource_ids": [
+          "iv_logo"
+        ],
+        "typical_bounds_ratio": 1.0
+      }
+    ]
+  },
+  "screen_graph": {
+    "nodes": [
+      {
+        "fingerprint": "scr_5b353a89a14fed38",
+        "screen_name": "Splash",
+        "category": "onboarding",
+        "purpose": "Introduces new users to the features and entry flow of Splash.",
+        "elements_count": 5,
+        "activity_name": "com.revrag.sampleapp.SplashActivity"
+      },
+      {
+        "fingerprint": "scr_c0c416f5fba65fa1",
+        "screen_name": "Welcome Back - Login",
+        "category": "authentication",
+        "purpose": "Authenticates the user into the application using mobile, email, or credentials (Welcome Back - Login).",
+        "elements_count": 6,
+        "activity_name": "com.revrag.sampleapp.LoginActivity"
+      },
+      {
+        "fingerprint": "scr_3e134ef2968fce94",
+        "screen_name": "Explore Products",
+        "category": "product_checkout",
+        "purpose": "Allows users to view and interact with Explore Products features including 'Search smart gadgets..., Home, Cart (0)'.",
+        "elements_count": 12,
+        "activity_name": "com.revrag.sampleapp.HomeActivity"
+      },
+      {
+        "fingerprint": "scr_6aca5b4a33df7673",
+        "screen_name": "Flagship ANC Smart Headset",
+        "category": "settings",
+        "purpose": "Provides system and application configuration controls for Flagship ANC Smart Headset.",
+        "elements_count": 5,
+        "activity_name": "com.revrag.sampleapp.Product_detailActivity"
+      },
+      {
+        "fingerprint": "scr_1c60c85364a6ca89",
+        "screen_name": "Alex Agent",
+        "category": "identity_verification",
+        "purpose": "Collects verification identity information for user compliance (Alex Agent).",
+        "elements_count": 6,
+        "activity_name": "com.revrag.sampleapp.ProfileActivity"
+      }
+    ],
+    "edges": [
+      {
+        "from_fingerprint": "scr_5b353a89a14fed38",
+        "to_fingerprint": "scr_c0c416f5fba65fa1",
+        "action_type": "tap",
+        "target_element_id": "btn_get_started",
+        "reason": "Explore interactive element btn_get_started"
+      },
+      {
+        "from_fingerprint": "scr_c0c416f5fba65fa1",
+        "to_fingerprint": "scr_c0c416f5fba65fa1",
+        "action_type": "input_text",
+        "target_element_id": "edit_phone",
+        "reason": "Auto-fill test phone number for login"
+      },
+      {
+        "from_fingerprint": "scr_c0c416f5fba65fa1",
+        "to_fingerprint": "scr_c0c416f5fba65fa1",
+        "action_type": "input_text",
+        "target_element_id": "edit_otp",
+        "reason": "Auto-fill test OTP for verification"
+      },
+      {
+        "from_fingerprint": "scr_c0c416f5fba65fa1",
+        "to_fingerprint": "scr_3e134ef2968fce94",
+        "action_type": "tap",
+        "target_element_id": "btn_login_submit",
+        "reason": "Submit authentication or KYC form"
+      },
+      {
+        "from_fingerprint": "scr_3e134ef2968fce94",
+        "to_fingerprint": "scr_3e134ef2968fce94",
+        "action_type": "input_text",
+        "target_element_id": "edit_search_bar",
+        "reason": "Fill editable field edit_search_bar"
+      },
+      {
+        "from_fingerprint": "scr_3e134ef2968fce94",
+        "to_fingerprint": "scr_6aca5b4a33df7673",
+        "action_type": "tap",
+        "target_element_id": "card_product_1",
+        "reason": "Explore interactive element card_product_1"
+      },
+      {
+        "from_fingerprint": "scr_6aca5b4a33df7673",
+        "to_fingerprint": "scr_3e134ef2968fce94",
+        "action_type": "tap",
+        "target_element_id": "btn_back",
+        "reason": "Explore interactive element btn_back"
+      },
+      {
+        "from_fingerprint": "scr_3e134ef2968fce94",
+        "to_fingerprint": "scr_6aca5b4a33df7673",
+        "action_type": "tap",
+        "target_element_id": "card_product_2",
+        "reason": "Explore interactive element card_product_2"
+      },
+      {
+        "from_fingerprint": "scr_6aca5b4a33df7673",
+        "to_fingerprint": "scr_6aca5b4a33df7673",
+        "action_type": "tap",
+        "target_element_id": "btn_add_to_cart",
+        "reason": "Explore interactive element btn_add_to_cart"
+      },
+      {
+        "from_fingerprint": "scr_6aca5b4a33df7673",
+        "to_fingerprint": "scr_3e134ef2968fce94",
+        "action_type": "back",
+        "target_element_id": null,
+        "reason": "Backtrack to explore unvisited branches"
+      },
+      {
+        "from_fingerprint": "scr_3e134ef2968fce94",
+        "to_fingerprint": "scr_3e134ef2968fce94",
+        "action_type": "tap",
+        "target_element_id": "nav_home",
+        "reason": "Explore interactive element nav_home"
+      },
+      {
+        "from_fingerprint": "scr_3e134ef2968fce94",
+        "to_fingerprint": "scr_3e134ef2968fce94",
+        "action_type": "tap",
+        "target_element_id": "nav_cart",
+        "reason": "Explore interactive element nav_cart"
+      },
+      {
+        "from_fingerprint": "scr_3e134ef2968fce94",
+        "to_fingerprint": "scr_1c60c85364a6ca89",
+        "action_type": "tap",
+        "target_element_id": "nav_profile",
+        "reason": "Explore interactive element nav_profile"
+      },
+      {
+        "from_fingerprint": "scr_1c60c85364a6ca89",
+        "to_fingerprint": "scr_3e134ef2968fce94",
+        "action_type": "tap",
+        "target_element_id": "btn_back_profile",
+        "reason": "Explore interactive element btn_back_profile"
+      },
+      {
+        "from_fingerprint": "scr_3e134ef2968fce94",
+        "to_fingerprint": "scr_c0c416f5fba65fa1",
+        "action_type": "back",
+        "target_element_id": null,
+        "reason": "Backtrack to explore unvisited branches"
+      },
+      {
+        "from_fingerprint": "scr_c0c416f5fba65fa1",
+        "to_fingerprint": "scr_3e134ef2968fce94",
+        "action_type": "tap",
+        "target_element_id": "btn_skip_login",
+        "reason": "Explore interactive element btn_skip_login"
+      }
+    ],
+    "entry_node": "scr_5b353a89a14fed38",
+    "journeys": [
+      {
+        "journey_name": "Path to Welcome Back - Login",
+        "step_count": 2,
+        "screen_sequence": [
+          "scr_5b353a89a14fed38",
+          "scr_c0c416f5fba65fa1"
+        ],
+        "description": "Navigation journey leading to Authenticates the user into the application using mobile, email, or credentials (Welcome Back - Login)."
+      },
+      {
+        "journey_name": "Path to Explore Products",
+        "step_count": 3,
+        "screen_sequence": [
+          "scr_5b353a89a14fed38",
+          "scr_c0c416f5fba65fa1",
+          "scr_3e134ef2968fce94"
+        ],
+        "description": "Navigation journey leading to Allows users to view and interact with Explore Products features including 'Search smart gadgets..., Home, Cart (0)'."
+      },
+      {
+        "journey_name": "Path to Flagship ANC Smart Headset",
+        "step_count": 4,
+        "screen_sequence": [
+          "scr_5b353a89a14fed38",
+          "scr_c0c416f5fba65fa1",
+          "scr_3e134ef2968fce94",
+          "scr_6aca5b4a33df7673"
+        ],
+        "description": "Navigation journey leading to Provides system and application configuration controls for Flagship ANC Smart Headset."
+      },
+      {
+        "journey_name": "Path to Alex Agent",
+        "step_count": 4,
+        "screen_sequence": [
+          "scr_5b353a89a14fed38",
+          "scr_c0c416f5fba65fa1",
+          "scr_3e134ef2968fce94",
+          "scr_1c60c85364a6ca89"
+        ],
+        "description": "Navigation journey leading to Collects verification identity information for user compliance (Alex Agent)."
+      }
+    ]
+  },
+  "screen_profiles": {
+    "scr_5b353a89a14fed38": {
+      "fingerprint": "scr_5b353a89a14fed38",
+      "screen_name": "Splash",
+      "purpose": "Introduces new users to the features and entry flow of Splash.",
+      "screen_category": "onboarding",
+      "key_actions": [
+        "Tap 'Get Started'"
+      ],
+      "elements": [
+        {
+          "element_id": "el_0",
+          "role": "view",
+          "plain_description": "UI visual component",
+          "form_field_type": null,
+          "suggested_test_value": null,
+          "bounds": {
+            "left": 0,
+            "top": 0,
+            "right": 1080,
+            "bottom": 2400
+          },
+          "text": null
+        },
+        {
+          "element_id": "iv_logo",
+          "role": "image",
+          "plain_description": "Image or icon asset (RevRag Brand Logo)",
+          "form_field_type": null,
+          "suggested_test_value": null,
+          "bounds": {
+            "left": 340,
+            "top": 600,
+            "right": 740,
+            "bottom": 1000
+          },
+          "text": null
+        },
+        {
+          "element_id": "tv_title",
+          "role": "text",
+          "plain_description": "Text label: 'RevRag AI Store'",
+          "form_field_type": null,
+          "suggested_test_value": null,
+          "bounds": {
+            "left": 100,
+            "top": 1050,
+            "right": 980,
+            "bottom": 1150
+          },
+          "text": "RevRag AI Store"
+        },
+        {
+          "element_id": "tv_subtitle",
+          "role": "text",
+          "plain_description": "Text label: 'Autonomous In-App Shopping Experience'",
+          "form_field_type": null,
+          "suggested_test_value": null,
+          "bounds": {
+            "left": 100,
+            "top": 1180,
+            "right": 980,
+            "bottom": 1260
+          },
+          "text": "Autonomous In-App Shopping Experience"
+        },
+        {
+          "element_id": "btn_get_started",
+          "role": "button",
+          "plain_description": "Interactive button: 'Get Started'",
+          "form_field_type": null,
+          "suggested_test_value": null,
+          "bounds": {
+            "left": 100,
+            "top": 1800,
+            "right": 980,
+            "bottom": 1950
+          },
+          "text": "Get Started"
+        }
+      ]
+    },
+    "scr_c0c416f5fba65fa1": {
+      "fingerprint": "scr_c0c416f5fba65fa1",
+      "screen_name": "Welcome Back - Login",
+      "purpose": "Authenticates the user into the application using mobile, email, or credentials (Welcome Back - Login).",
+      "screen_category": "authentication",
+      "key_actions": [
+        "Input text into phone (edit_phone)",
+        "Input text into otp (edit_otp)",
+        "Tap 'Verify & Login'",
+        "Tap 'Skip for now'"
+      ],
+      "elements": [
+        {
+          "element_id": "el_0",
+          "role": "view",
+          "plain_description": "UI visual component",
+          "form_field_type": null,
+          "suggested_test_value": null,
+          "bounds": {
+            "left": 0,
+            "top": 0,
+            "right": 1080,
+            "bottom": 2400
+          },
+          "text": null
+        },
+        {
+          "element_id": "tv_login_heading",
+          "role": "heading",
+          "plain_description": "Primary screen heading: 'Welcome Back - Login'",
+          "form_field_type": null,
+          "suggested_test_value": null,
+          "bounds": {
+            "left": 80,
+            "top": 300,
+            "right": 1000,
+            "bottom": 400
+          },
+          "text": "Welcome Back - Login"
+        },
+        {
+          "element_id": "edit_phone",
+          "role": "text_input",
+          "plain_description": "Input field for entering phone or mobile number (Enter 10-digit mobile number)",
+          "form_field_type": "phone",
+          "suggested_test_value": null,
+          "bounds": {
+            "left": 80,
+            "top": 500,
+            "right": 1000,
+            "bottom": 630
+          },
+          "text": "Enter 10-digit mobile number"
+        },
+        {
+          "element_id": "edit_otp",
+          "role": "text_input",
+          "plain_description": "Input field for verification code or OTP",
+          "form_field_type": "otp",
+          "suggested_test_value": null,
+          "bounds": {
+            "left": 80,
+            "top": 680,
+            "right": 1000,
+            "bottom": 810
+          },
+          "text": "Enter 6-digit OTP"
+        },
+        {
+          "element_id": "btn_login_submit",
+          "role": "button",
+          "plain_description": "Interactive button: 'Verify & Login'",
+          "form_field_type": null,
+          "suggested_test_value": null,
+          "bounds": {
+            "left": 80,
+            "top": 880,
+            "right": 1000,
+            "bottom": 1020
+          },
+          "text": "Verify & Login"
+        },
+        {
+          "element_id": "btn_skip_login",
+          "role": "button",
+          "plain_description": "Interactive button: 'Skip for now'",
+          "form_field_type": null,
+          "suggested_test_value": null,
+          "bounds": {
+            "left": 380,
+            "top": 1080,
+            "right": 700,
+            "bottom": 1160
+          },
+          "text": "Skip for now"
+        }
+      ]
+    },
+    "scr_3e134ef2968fce94": {
+      "fingerprint": "scr_3e134ef2968fce94",
+      "screen_name": "Explore Products",
+      "purpose": "Allows users to view and interact with Explore Products features including 'Search smart gadgets..., Home, Cart (0)'.",
+      "screen_category": "product_checkout",
+      "key_actions": [
+        "Input text into search (edit_search_bar)",
+        "Tap 'Home'",
+        "Tap 'Cart (0)'",
+        "Tap 'Profile'"
+      ],
+      "elements": [
+        {
+          "element_id": "el_0",
+          "role": "view",
+          "plain_description": "UI visual component",
+          "form_field_type": null,
+          "suggested_test_value": null,
+          "bounds": {
+            "left": 0,
+            "top": 0,
+            "right": 1080,
+            "bottom": 2400
+          },
+          "text": null
+        },
+        {
+          "element_id": "tv_home_title",
+          "role": "heading",
+          "plain_description": "Primary screen heading: 'Explore Products'",
+          "form_field_type": null,
+          "suggested_test_value": null,
+          "bounds": {
+            "left": 60,
+            "top": 150,
+            "right": 800,
+            "bottom": 250
+          },
+          "text": "Explore Products"
+        },
+        {
+          "element_id": "edit_search_bar",
+          "role": "text_input",
+          "plain_description": "Search input field for querying content",
+          "form_field_type": "search",
+          "suggested_test_value": null,
+          "bounds": {
+            "left": 60,
+            "top": 280,
+            "right": 1020,
+            "bottom": 400
+          },
+          "text": "Search smart gadgets..."
+        },
+        {
+          "element_id": "card_product_1",
+          "role": "button",
+          "plain_description": "Interactive button: 'card_product_1'",
+          "form_field_type": null,
+          "suggested_test_value": null,
+          "bounds": {
+            "left": 60,
+            "top": 450,
+            "right": 1020,
+            "bottom": 780
+          },
+          "text": null
+        },
+        {
+          "element_id": "tv_product_title",
+          "role": "text",
+          "plain_description": "Text label: 'Apple Watch Ultra 2'",
+          "form_field_type": null,
+          "suggested_test_value": null,
+          "bounds": {
+            "left": 90,
+            "top": 480,
+            "right": 900,
+            "bottom": 550
+          },
+          "text": "Sony WH-1000XM5"
+        },
+        {
+          "element_id": "tv_product_price",
+          "role": "text",
+          "plain_description": "Text label: '$799.00'",
+          "form_field_type": null,
+          "suggested_test_value": null,
+          "bounds": {
+            "left": 90,
+            "top": 560,
+            "right": 400,
+            "bottom": 630
+          },
+          "text": "$349.99"
+        },
+        {
+          "element_id": "card_product_2",
+          "role": "button",
+          "plain_description": "Interactive button: 'card_product_2'",
+          "form_field_type": null,
+          "suggested_test_value": null,
+          "bounds": {
+            "left": 60,
+            "top": 820,
+            "right": 1020,
+            "bottom": 1150
+          },
+          "text": null
+        },
+        {
+          "element_id": "tv_product_title",
+          "role": "text",
+          "plain_description": "Text label: 'Apple Watch Ultra 2'",
+          "form_field_type": null,
+          "suggested_test_value": null,
+          "bounds": {
+            "left": 90,
+            "top": 850,
+            "right": 900,
+            "bottom": 920
+          },
+          "text": "Apple Watch Ultra 2"
+        },
+        {
+          "element_id": "tv_product_price",
+          "role": "text",
+          "plain_description": "Text label: '$799.00'",
+          "form_field_type": null,
+          "suggested_test_value": null,
+          "bounds": {
+            "left": 90,
+            "top": 930,
+            "right": 400,
+            "bottom": 1000
+          },
+          "text": "$799.00"
+        },
+        {
+          "element_id": "nav_home",
+          "role": "button",
+          "plain_description": "Interactive button: 'Home'",
+          "form_field_type": null,
+          "suggested_test_value": null,
+          "bounds": {
+            "left": 0,
+            "top": 2200,
+            "right": 360,
+            "bottom": 2400
+          },
+          "text": "Home"
+        },
+        {
+          "element_id": "nav_cart",
+          "role": "button",
+          "plain_description": "Interactive button: 'Cart (0)'",
+          "form_field_type": null,
+          "suggested_test_value": null,
+          "bounds": {
+            "left": 360,
+            "top": 2200,
+            "right": 720,
+            "bottom": 2400
+          },
+          "text": "Cart (0)"
+        },
+        {
+          "element_id": "nav_profile",
+          "role": "button",
+          "plain_description": "Interactive button: 'Profile'",
+          "form_field_type": null,
+          "suggested_test_value": null,
+          "bounds": {
+            "left": 720,
+            "top": 2200,
+            "right": 1080,
+            "bottom": 2400
+          },
+          "text": "Profile"
+        }
+      ]
+    },
+    "scr_6aca5b4a33df7673": {
+      "fingerprint": "scr_6aca5b4a33df7673",
+      "screen_name": "Flagship ANC Smart Headset",
+      "purpose": "Provides system and application configuration controls for Flagship ANC Smart Headset.",
+      "screen_category": "settings",
+      "key_actions": [
+        "Tap 'Add to Cart - $349.99'"
+      ],
+      "elements": [
+        {
+          "element_id": "el_0",
+          "role": "view",
+          "plain_description": "UI visual component",
+          "form_field_type": null,
+          "suggested_test_value": null,
+          "bounds": {
+            "left": 0,
+            "top": 0,
+            "right": 1080,
+            "bottom": 2400
+          },
+          "text": null
+        },
+        {
+          "element_id": "btn_back",
+          "role": "button",
+          "plain_description": "Interactive button: 'Back'",
+          "form_field_type": null,
+          "suggested_test_value": null,
+          "bounds": {
+            "left": 40,
+            "top": 120,
+            "right": 160,
+            "bottom": 240
+          },
+          "text": null
+        },
+        {
+          "element_id": "tv_detail_title",
+          "role": "heading",
+          "plain_description": "Primary screen heading: 'Flagship ANC Smart Headset'",
+          "form_field_type": null,
+          "suggested_test_value": null,
+          "bounds": {
+            "left": 60,
+            "top": 300,
+            "right": 1020,
+            "bottom": 420
+          },
+          "text": "Flagship ANC Smart Headset"
+        },
+        {
+          "element_id": "tv_detail_desc",
+          "role": "text",
+          "plain_description": "Text label: 'Industry-leading noise canceling with dual processors and 8 microphones for superior clear sound.'",
+          "form_field_type": null,
+          "suggested_test_value": null,
+          "bounds": {
+            "left": 60,
+            "top": 450,
+            "right": 1020,
+            "bottom": 700
+          },
+          "text": "Industry-leading noise canceling with dual processors and 8 microphones for superior clear sound."
+        },
+        {
+          "element_id": "btn_add_to_cart",
+          "role": "button",
+          "plain_description": "Interactive button: 'Add to Cart - $349.99'",
+          "form_field_type": null,
+          "suggested_test_value": null,
+          "bounds": {
+            "left": 80,
+            "top": 1900,
+            "right": 1000,
+            "bottom": 2050
+          },
+          "text": "Add to Cart - $349.99"
+        }
+      ]
+    },
+    "scr_1c60c85364a6ca89": {
+      "fingerprint": "scr_1c60c85364a6ca89",
+      "screen_name": "Alex Agent",
+      "purpose": "Collects verification identity information for user compliance (Alex Agent).",
+      "screen_category": "identity_verification",
+      "key_actions": [
+        "Tap 'Complete KYC Verification'",
+        "Tap 'Log Out'"
+      ],
+      "elements": [
+        {
+          "element_id": "el_0",
+          "role": "view",
+          "plain_description": "UI visual component",
+          "form_field_type": null,
+          "suggested_test_value": null,
+          "bounds": {
+            "left": 0,
+            "top": 0,
+            "right": 1080,
+            "bottom": 2400
+          },
+          "text": null
+        },
+        {
+          "element_id": "btn_back_profile",
+          "role": "button",
+          "plain_description": "Interactive button: 'Back'",
+          "form_field_type": null,
+          "suggested_test_value": null,
+          "bounds": {
+            "left": 40,
+            "top": 120,
+            "right": 160,
+            "bottom": 240
+          },
+          "text": null
+        },
+        {
+          "element_id": "tv_user_name",
+          "role": "heading",
+          "plain_description": "Primary screen heading: 'Alex Agent'",
+          "form_field_type": null,
+          "suggested_test_value": null,
+          "bounds": {
+            "left": 80,
+            "top": 320,
+            "right": 800,
+            "bottom": 420
+          },
+          "text": "Alex Agent"
+        },
+        {
+          "element_id": "tv_kyc_status",
+          "role": "text",
+          "plain_description": "Text label: 'KYC Status: Pending Verification'",
+          "form_field_type": null,
+          "suggested_test_value": null,
+          "bounds": {
+            "left": 80,
+            "top": 450,
+            "right": 900,
+            "bottom": 530
+          },
+          "text": "KYC Status: Pending Verification"
+        },
+        {
+          "element_id": "btn_verify_kyc",
+          "role": "button",
+          "plain_description": "Interactive button: 'Complete KYC Verification'",
+          "form_field_type": null,
+          "suggested_test_value": null,
+          "bounds": {
+            "left": 80,
+            "top": 600,
+            "right": 1000,
+            "bottom": 730
+          },
+          "text": "Complete KYC Verification"
+        },
+        {
+          "element_id": "btn_logout",
+          "role": "button",
+          "plain_description": "Interactive button: 'Log Out'",
+          "form_field_type": null,
+          "suggested_test_value": null,
+          "bounds": {
+            "left": 80,
+            "top": 1900,
+            "right": 1000,
+            "bottom": 2030
+          },
+          "text": "Log Out"
+        }
+      ]
+    }
+  }
+}

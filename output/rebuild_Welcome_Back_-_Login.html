@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Rebuild: Welcome Back - Login</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background-color: #0f111a;
+    font-family: Inter, -apple-system, Roboto, sans-serif;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    padding: 20px;
+  }
+  .phone-frame {
+    width: 360px;
+    height: 800px;
+    position: relative;
+    background-color: #12141d;
+    border-radius: 36px;
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7), 0 0 0 8px #262938;
+    overflow: hidden;
+  }
+  .status-bar {
+    position: absolute;
+    top: 0; left: 0; right: 0; height: 28px;
+    background-color: #1a202c;
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 0 16px; font-size: 10px; color: #94A3B8;
+  }
+  .ui-button {
+    position: absolute;
+    background: #6366f1;
+    color: #ffffff;
+    border: none;
+    border-radius: 12px;
+    font-weight: 600;
+    font-size: 13px;
+    cursor: pointer;
+    box-shadow: 0 4px 14px rgba(99, 102, 241, 0.4);
+    display: flex; align-items: center; justify-content: center;
+  }
+  .ui-input {
+    position: absolute;
+    background: #1a202c;
+    color: #F8FAFC;
+    border: 1.5px solid #6366f1;
+    border-radius: 12px;
+    padding: 0 12px;
+    font-size: 12px;
+    outline: none;
+  }
+  .ui-card {
+    position: absolute;
+    background: #1a202c;
+    border: 1px solid #334155;
+    border-radius: 12px;
+  }
+  .ui-heading {
+    position: absolute;
+    color: #F8FAFC;
+    font-size: 16px;
+    font-weight: 700;
+  }
+  .ui-text {
+    position: absolute;
+    color: #94A3B8;
+    font-size: 11px;
+    line-height: 1.3;
+  }
+  .ui-badge {
+    position: absolute;
+    background: #059669;
+    color: #ffffff;
+    padding: 3px 8px;
+    border-radius: 6px;
+    font-size: 9px;
+    font-weight: 600;
+  }
+  .ui-tab {
+    position: absolute;
+    background: #1a202c;
+    color: #94A3B8;
+    border-top: 1px solid #334155;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 10px;
+  }
+</style>
+</head>
+<body>
+  <div class="phone-frame">
+    <div class="status-bar">
+      <span>9:41</span>
+      <span>5G 100%</span>
+    </div>
+    <div class="ui-text" style="left:0.0%; top:0.0%; width:100.0%;">UI visual component</div><h2 class="ui-heading" style="left:7.41%; top:12.5%; width:85.19%;">Welcome Back - Login</h2><input type="text" class="ui-input" placeholder="Enter phone..." value="Enter 10-digit mobile number" style="left:7.41%; top:20.83%; width:85.19%; height:5.42%;" /><input type="text" class="ui-input" placeholder="Enter otp..." value="Enter 6-digit OTP" style="left:7.41%; top:28.33%; width:85.19%; height:5.42%;" /><button class="ui-button" style="left:7.41%; top:36.67%; width:85.19%; height:5.83%;">Verify & Login</button><button class="ui-button" style="left:35.19%; top:45.0%; width:29.63%; height:3.33%;">Skip for now</button>
+  </div>
+</body>
+</html>
