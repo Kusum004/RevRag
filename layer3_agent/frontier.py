@@ -11,44 +11,44 @@ TAB_KEYWORDS = {
 def calculate_element_priority(el: UIElement, screen_height: int = 2400) -> int:
     """
     Computes priority score for an interactive element (higher = explored sooner).
-    Ensures bottom tabs, FABs, and primary navigation destinations are explored first.
+    Ensures bottom tabs (Post, My Network, Jobs, Notifications) are explored FIRST,
+    while in-feed metrics, analytics cards, and reaction buttons are deprioritized.
     """
     score = 10
     desc_str = f"{el.content_desc or ''} {el.text or ''} {el.resource_id or ''}".lower()
     
     # Check for tab / primary action keywords
-    is_tab_keyword = any(kw in desc_str for kw in TAB_KEYWORDS)
-    is_bottom_nav = el.bounds.top >= int(screen_height * 0.75) if el.bounds else False
-    is_top_bar = el.bounds.bottom <= int(screen_height * 0.18) if el.bounds else False
+    is_tab_keyword = any(kw in desc_str for kw in ["tab", "network", "post", "jobs", "notification", "home", "feed", "nav"])
+    is_bottom_nav = el.bounds.top >= int(screen_height * 0.78) if el.bounds else False
 
     # Priority 1: Bottom Navigation tabs (Post, My Network, Notifications, Jobs, Home)
     if is_bottom_nav and (is_tab_keyword or el.clickable):
-        score += 100
+        score += 500
         # Post / Add / Create FABs in the bottom bar get highest priority
         if any(kw in desc_str for kw in ["post", "create", "add", "plus", "+"]):
-            score += 30
+            score += 100
         elif any(kw in desc_str for kw in ["network", "job", "notification"]):
-            score += 20
+            score += 50
 
     # Priority 2: Floating Action Buttons (FAB) & Create Actions anywhere
     elif any(kw in desc_str for kw in ["post", "create", "add", "compose", "fab"]):
-        score += 80
+        score += 300
 
     # Priority 3: Top Navigation / Search / Menu / Tabs
-    elif is_tab_keyword or is_top_bar:
-        score += 50
+    elif is_tab_keyword:
+        score += 150
 
     # Priority 4: Editable Text Inputs
     elif el.editable:
-        score += 40
+        score += 60
 
     # Priority 5: General Buttons
     elif "button" in el.class_name.lower() or el.clickable:
         score += 30
 
-    # Deprioritize small micro-actions inside feed (like, comment, share, repost)
-    if any(kw in desc_str for kw in ["like", "comment", "share", "repost", "reactions"]):
-        score -= 15
+    # Deprioritize small micro-actions inside feed (like, comment, share, repost, analytics)
+    if any(kw in desc_str for kw in ["like", "comment", "share", "repost", "reactions", "impression", "analytics", "stat", "view"]):
+        score -= 250
 
     return score
 

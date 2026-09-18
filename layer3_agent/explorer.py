@@ -28,6 +28,7 @@ class ExplorationAgent:
         self.screen_history: List[str] = []
         self.handled_auth_screens: Set[str] = set()
         self.scrolled_screens: Set[str] = set()
+        self.same_screen_actions: Dict[str, int] = {}
 
     def explore(self) -> Tuple[Dict[str, ScreenState], List[TransitionEdge]]:
         """
@@ -91,6 +92,29 @@ class ExplorationAgent:
                     to_fingerprint=resulting_state.fingerprint,
                     timestamp=time.time()
                 ))
+
+                # Anti-thrashing: Detect if tapping elements fails to produce a state change
+                if resulting_state.fingerprint == current_fp:
+                    self.same_screen_actions[current_fp] = self.same_screen_actions.get(current_fp, 0) + 1
+                    # If 2 consecutive clicks on this screen yielded no transition (e.g. static chart/labels on detail screen)
+                    if self.same_screen_actions[current_fp] >= 2 and step < self.step_budget:
+                        escape_action = Action(
+                            action_type=ActionType.BACK,
+                            reason=f"Escape non-navigating sub-screen {current_fp}"
+                        )
+                        step += 1
+                        self.controller.perform_action(escape_action)
+                        escaped_state = self.controller.get_screen_state()
+                        self.transitions.append(TransitionEdge(
+                            from_fingerprint=current_fp,
+                            action=escape_action,
+                            to_fingerprint=escaped_state.fingerprint,
+                            timestamp=time.time()
+                        ))
+                        self.same_screen_actions[current_fp] = 0
+                        continue
+                else:
+                    self.same_screen_actions[current_fp] = 0
 
             else:
                 # 3. No visible unexplored elements on this screen
