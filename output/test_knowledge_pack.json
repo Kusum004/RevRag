@@ -1,11 +1,11 @@
 {
   "metadata": {
     "package_name": "com.revrag.sampleapp",
-    "timestamp": "2026-09-18 04:00:14 UTC",
+    "timestamp": "2026-09-18 07:13:07 UTC",
     "exploration_engine": "RevRag-ZeroTouch-v1.0",
     "total_screens_discovered": 5,
-    "total_transitions_logged": 16,
-    "pack_size_kb": 25.8,
+    "total_transitions_logged": 17,
+    "pack_size_kb": 26.32,
     "raw_tree_equivalent_kb": 6.97,
     "compression_ratio": "95.4%"
   },
@@ -48,10 +48,10 @@
         "component_type": "TextView",
         "count_across_app": 13,
         "sample_resource_ids": [
-          "tv_product_price",
+          "tv_subtitle",
+          "tv_user_name",
           "tv_product_title",
-          "tv_detail_title",
-          "tv_title"
+          "tv_product_price"
         ],
         "typical_bounds_ratio": 1.0
       },
@@ -59,10 +59,10 @@
         "component_type": "Button",
         "count_across_app": 5,
         "sample_resource_ids": [
-          "btn_logout",
+          "btn_login_submit",
+          "btn_verify_kyc",
           "btn_add_to_cart",
-          "btn_get_started",
-          "btn_login_submit"
+          "btn_get_started"
         ],
         "typical_bounds_ratio": 1.0
       },
@@ -90,8 +90,8 @@
         "component_type": "CardView",
         "count_across_app": 2,
         "sample_resource_ids": [
-          "card_product_1",
-          "card_product_2"
+          "card_product_2",
+          "card_product_1"
         ],
         "typical_bounds_ratio": 1.0
       },
@@ -133,20 +133,12 @@
         "activity_name": "com.revrag.sampleapp.LoginActivity"
       },
       {
-        "fingerprint": "scr_3e134ef2968fce94",
+        "fingerprint": "scr_f7a87d1f512bdb4f",
         "screen_name": "Explore Products",
         "category": "product_checkout",
-        "purpose": "Allows users to view and interact with Explore Products features including 'Search smart gadgets..., Home, Cart (0)'.",
+        "purpose": "Allows users to view and interact with Explore Products features including 'Explore Products, Search smart gadgets..., Home'.",
         "elements_count": 12,
         "activity_name": "com.revrag.sampleapp.HomeActivity"
-      },
-      {
-        "fingerprint": "scr_6aca5b4a33df7673",
-        "screen_name": "Flagship ANC Smart Headset",
-        "category": "settings",
-        "purpose": "Provides system and application configuration controls for Flagship ANC Smart Headset.",
-        "elements_count": 5,
-        "activity_name": "com.revrag.sampleapp.Product_detailActivity"
       },
       {
         "fingerprint": "scr_1c60c85364a6ca89",
@@ -155,6 +147,14 @@
         "purpose": "Collects verification identity information for user compliance (Alex Agent).",
         "elements_count": 6,
         "activity_name": "com.revrag.sampleapp.ProfileActivity"
+      },
+      {
+        "fingerprint": "scr_6aca5b4a33df7673",
+        "screen_name": "Flagship ANC Smart Headset",
+        "category": "settings",
+        "purpose": "Provides system and application configuration controls for Flagship ANC Smart Headset.",
+        "elements_count": 5,
+        "activity_name": "com.revrag.sampleapp.Product_detailActivity"
       }
     ],
     "edges": [
@@ -163,7 +163,7 @@
         "to_fingerprint": "scr_c0c416f5fba65fa1",
         "action_type": "tap",
         "target_element_id": "btn_get_started",
-        "reason": "Explore interactive element btn_get_started"
+        "reason": "Explore interactive element btn_get_started (Get Started)"
       },
       {
         "from_fingerprint": "scr_c0c416f5fba65fa1",
@@ -181,94 +181,101 @@
       },
       {
         "from_fingerprint": "scr_c0c416f5fba65fa1",
-        "to_fingerprint": "scr_3e134ef2968fce94",
+        "to_fingerprint": "scr_f7a87d1f512bdb4f",
         "action_type": "tap",
         "target_element_id": "btn_login_submit",
         "reason": "Submit authentication or KYC form"
       },
       {
-        "from_fingerprint": "scr_3e134ef2968fce94",
-        "to_fingerprint": "scr_3e134ef2968fce94",
+        "from_fingerprint": "scr_f7a87d1f512bdb4f",
+        "to_fingerprint": "scr_f7a87d1f512bdb4f",
+        "action_type": "tap",
+        "target_element_id": "nav_home",
+        "reason": "Explore interactive element nav_home (Home)"
+      },
+      {
+        "from_fingerprint": "scr_f7a87d1f512bdb4f",
+        "to_fingerprint": "scr_f7a87d1f512bdb4f",
+        "action_type": "tap",
+        "target_element_id": "nav_cart",
+        "reason": "Explore interactive element nav_cart (Cart (0))"
+      },
+      {
+        "from_fingerprint": "scr_f7a87d1f512bdb4f",
+        "to_fingerprint": "scr_1c60c85364a6ca89",
+        "action_type": "tap",
+        "target_element_id": "nav_profile",
+        "reason": "Explore interactive element nav_profile (Profile)"
+      },
+      {
+        "from_fingerprint": "scr_1c60c85364a6ca89",
+        "to_fingerprint": "scr_c0c416f5fba65fa1",
+        "action_type": "tap",
+        "target_element_id": "btn_logout",
+        "reason": "Explore interactive element btn_logout (Log Out)"
+      },
+      {
+        "from_fingerprint": "scr_f7a87d1f512bdb4f",
+        "to_fingerprint": "scr_f7a87d1f512bdb4f",
+        "action_type": "tap",
+        "target_element_id": "tv_home_title",
+        "reason": "Explore interactive element tv_home_title (Explore Products)"
+      },
+      {
+        "from_fingerprint": "scr_f7a87d1f512bdb4f",
+        "to_fingerprint": "scr_f7a87d1f512bdb4f",
         "action_type": "input_text",
         "target_element_id": "edit_search_bar",
         "reason": "Fill editable field edit_search_bar"
       },
       {
-        "from_fingerprint": "scr_3e134ef2968fce94",
+        "from_fingerprint": "scr_f7a87d1f512bdb4f",
         "to_fingerprint": "scr_6aca5b4a33df7673",
         "action_type": "tap",
         "target_element_id": "card_product_1",
-        "reason": "Explore interactive element card_product_1"
-      },
-      {
-        "from_fingerprint": "scr_6aca5b4a33df7673",
-        "to_fingerprint": "scr_3e134ef2968fce94",
-        "action_type": "tap",
-        "target_element_id": "btn_back",
-        "reason": "Explore interactive element btn_back"
-      },
-      {
-        "from_fingerprint": "scr_3e134ef2968fce94",
-        "to_fingerprint": "scr_6aca5b4a33df7673",
-        "action_type": "tap",
-        "target_element_id": "card_product_2",
-        "reason": "Explore interactive element card_product_2"
+        "reason": "Explore interactive element card_product_1 (androidx.cardview.widget.CardView)"
       },
       {
         "from_fingerprint": "scr_6aca5b4a33df7673",
         "to_fingerprint": "scr_6aca5b4a33df7673",
         "action_type": "tap",
         "target_element_id": "btn_add_to_cart",
-        "reason": "Explore interactive element btn_add_to_cart"
+        "reason": "Explore interactive element btn_add_to_cart (Add to Cart - $349.99)"
       },
       {
         "from_fingerprint": "scr_6aca5b4a33df7673",
-        "to_fingerprint": "scr_3e134ef2968fce94",
+        "to_fingerprint": "scr_f7a87d1f512bdb4f",
+        "action_type": "tap",
+        "target_element_id": "btn_back",
+        "reason": "Explore interactive element btn_back (Back)"
+      },
+      {
+        "from_fingerprint": "scr_f7a87d1f512bdb4f",
+        "to_fingerprint": "scr_6aca5b4a33df7673",
+        "action_type": "tap",
+        "target_element_id": "card_product_2",
+        "reason": "Explore interactive element card_product_2 (androidx.cardview.widget.CardView)"
+      },
+      {
+        "from_fingerprint": "scr_6aca5b4a33df7673",
+        "to_fingerprint": "scr_f7a87d1f512bdb4f",
         "action_type": "back",
         "target_element_id": null,
-        "reason": "Backtrack to explore unvisited branches"
+        "reason": "Backtrack to parent screen to explore unvisited branches/tabs"
       },
       {
-        "from_fingerprint": "scr_3e134ef2968fce94",
-        "to_fingerprint": "scr_3e134ef2968fce94",
-        "action_type": "tap",
-        "target_element_id": "nav_home",
-        "reason": "Explore interactive element nav_home"
-      },
-      {
-        "from_fingerprint": "scr_3e134ef2968fce94",
-        "to_fingerprint": "scr_3e134ef2968fce94",
-        "action_type": "tap",
-        "target_element_id": "nav_cart",
-        "reason": "Explore interactive element nav_cart"
-      },
-      {
-        "from_fingerprint": "scr_3e134ef2968fce94",
-        "to_fingerprint": "scr_1c60c85364a6ca89",
-        "action_type": "tap",
-        "target_element_id": "nav_profile",
-        "reason": "Explore interactive element nav_profile"
-      },
-      {
-        "from_fingerprint": "scr_1c60c85364a6ca89",
-        "to_fingerprint": "scr_3e134ef2968fce94",
-        "action_type": "tap",
-        "target_element_id": "btn_back_profile",
-        "reason": "Explore interactive element btn_back_profile"
-      },
-      {
-        "from_fingerprint": "scr_3e134ef2968fce94",
+        "from_fingerprint": "scr_f7a87d1f512bdb4f",
         "to_fingerprint": "scr_c0c416f5fba65fa1",
         "action_type": "back",
         "target_element_id": null,
-        "reason": "Backtrack to explore unvisited branches"
+        "reason": "Backtrack to parent screen to explore unvisited branches/tabs"
       },
       {
         "from_fingerprint": "scr_c0c416f5fba65fa1",
-        "to_fingerprint": "scr_3e134ef2968fce94",
+        "to_fingerprint": "scr_f7a87d1f512bdb4f",
         "action_type": "tap",
         "target_element_id": "btn_skip_login",
-        "reason": "Explore interactive element btn_skip_login"
+        "reason": "Explore interactive element btn_skip_login (Skip for now)"
       }
     ],
     "entry_node": "scr_5b353a89a14fed38",
@@ -288,20 +295,9 @@
         "screen_sequence": [
           "scr_5b353a89a14fed38",
           "scr_c0c416f5fba65fa1",
-          "scr_3e134ef2968fce94"
+          "scr_f7a87d1f512bdb4f"
         ],
-        "description": "Navigation journey leading to Allows users to view and interact with Explore Products features including 'Search smart gadgets..., Home, Cart (0)'."
-      },
-      {
-        "journey_name": "Path to Flagship ANC Smart Headset",
-        "step_count": 4,
-        "screen_sequence": [
-          "scr_5b353a89a14fed38",
-          "scr_c0c416f5fba65fa1",
-          "scr_3e134ef2968fce94",
-          "scr_6aca5b4a33df7673"
-        ],
-        "description": "Navigation journey leading to Provides system and application configuration controls for Flagship ANC Smart Headset."
+        "description": "Navigation journey leading to Allows users to view and interact with Explore Products features including 'Explore Products, Search smart gadgets..., Home'."
       },
       {
         "journey_name": "Path to Alex Agent",
@@ -309,10 +305,21 @@
         "screen_sequence": [
           "scr_5b353a89a14fed38",
           "scr_c0c416f5fba65fa1",
-          "scr_3e134ef2968fce94",
+          "scr_f7a87d1f512bdb4f",
           "scr_1c60c85364a6ca89"
         ],
         "description": "Navigation journey leading to Collects verification identity information for user compliance (Alex Agent)."
+      },
+      {
+        "journey_name": "Path to Flagship ANC Smart Headset",
+        "step_count": 4,
+        "screen_sequence": [
+          "scr_5b353a89a14fed38",
+          "scr_c0c416f5fba65fa1",
+          "scr_f7a87d1f512bdb4f",
+          "scr_6aca5b4a33df7673"
+        ],
+        "description": "Navigation journey leading to Provides system and application configuration controls for Flagship ANC Smart Headset."
       }
     ]
   },
@@ -496,12 +503,13 @@
         }
       ]
     },
-    "scr_3e134ef2968fce94": {
-      "fingerprint": "scr_3e134ef2968fce94",
+    "scr_f7a87d1f512bdb4f": {
+      "fingerprint": "scr_f7a87d1f512bdb4f",
       "screen_name": "Explore Products",
-      "purpose": "Allows users to view and interact with Explore Products features including 'Search smart gadgets..., Home, Cart (0)'.",
+      "purpose": "Allows users to view and interact with Explore Products features including 'Explore Products, Search smart gadgets..., Home'.",
       "screen_category": "product_checkout",
       "key_actions": [
+        "Tap 'Explore Products'",
         "Input text into search (edit_search_bar)",
         "Tap 'Home'",
         "Tap 'Cart (0)'",
@@ -524,8 +532,8 @@
         },
         {
           "element_id": "tv_home_title",
-          "role": "heading",
-          "plain_description": "Primary screen heading: 'Explore Products'",
+          "role": "button",
+          "plain_description": "Interactive button: 'Explore Products'",
           "form_field_type": null,
           "suggested_test_value": null,
           "bounds": {
@@ -678,87 +686,6 @@
         }
       ]
     },
-    "scr_6aca5b4a33df7673": {
-      "fingerprint": "scr_6aca5b4a33df7673",
-      "screen_name": "Flagship ANC Smart Headset",
-      "purpose": "Provides system and application configuration controls for Flagship ANC Smart Headset.",
-      "screen_category": "settings",
-      "key_actions": [
-        "Tap 'Add to Cart - $349.99'"
-      ],
-      "elements": [
-        {
-          "element_id": "el_0",
-          "role": "view",
-          "plain_description": "UI visual component",
-          "form_field_type": null,
-          "suggested_test_value": null,
-          "bounds": {
-            "left": 0,
-            "top": 0,
-            "right": 1080,
-            "bottom": 2400
-          },
-          "text": null
-        },
-        {
-          "element_id": "btn_back",
-          "role": "button",
-          "plain_description": "Interactive button: 'Back'",
-          "form_field_type": null,
-          "suggested_test_value": null,
-          "bounds": {
-            "left": 40,
-            "top": 120,
-            "right": 160,
-            "bottom": 240
-          },
-          "text": null
-        },
-        {
-          "element_id": "tv_detail_title",
-          "role": "heading",
-          "plain_description": "Primary screen heading: 'Flagship ANC Smart Headset'",
-          "form_field_type": null,
-          "suggested_test_value": null,
-          "bounds": {
-            "left": 60,
-            "top": 300,
-            "right": 1020,
-            "bottom": 420
-          },
-          "text": "Flagship ANC Smart Headset"
-        },
-        {
-          "element_id": "tv_detail_desc",
-          "role": "text",
-          "plain_description": "Text label: 'Industry-leading noise canceling with dual processors and 8 microphones for superior clear sound.'",
-          "form_field_type": null,
-          "suggested_test_value": null,
-          "bounds": {
-            "left": 60,
-            "top": 450,
-            "right": 1020,
-            "bottom": 700
-          },
-          "text": "Industry-leading noise canceling with dual processors and 8 microphones for superior clear sound."
-        },
-        {
-          "element_id": "btn_add_to_cart",
-          "role": "button",
-          "plain_description": "Interactive button: 'Add to Cart - $349.99'",
-          "form_field_type": null,
-          "suggested_test_value": null,
-          "bounds": {
-            "left": 80,
-            "top": 1900,
-            "right": 1000,
-            "bottom": 2050
-          },
-          "text": "Add to Cart - $349.99"
-        }
-      ]
-    },
     "scr_1c60c85364a6ca89": {
       "fingerprint": "scr_1c60c85364a6ca89",
       "screen_name": "Alex Agent",
@@ -852,6 +779,87 @@
             "bottom": 2030
           },
           "text": "Log Out"
+        }
+      ]
+    },
+    "scr_6aca5b4a33df7673": {
+      "fingerprint": "scr_6aca5b4a33df7673",
+      "screen_name": "Flagship ANC Smart Headset",
+      "purpose": "Provides system and application configuration controls for Flagship ANC Smart Headset.",
+      "screen_category": "settings",
+      "key_actions": [
+        "Tap 'Add to Cart - $349.99'"
+      ],
+      "elements": [
+        {
+          "element_id": "el_0",
+          "role": "view",
+          "plain_description": "UI visual component",
+          "form_field_type": null,
+          "suggested_test_value": null,
+          "bounds": {
+            "left": 0,
+            "top": 0,
+            "right": 1080,
+            "bottom": 2400
+          },
+          "text": null
+        },
+        {
+          "element_id": "btn_back",
+          "role": "button",
+          "plain_description": "Interactive button: 'Back'",
+          "form_field_type": null,
+          "suggested_test_value": null,
+          "bounds": {
+            "left": 40,
+            "top": 120,
+            "right": 160,
+            "bottom": 240
+          },
+          "text": null
+        },
+        {
+          "element_id": "tv_detail_title",
+          "role": "heading",
+          "plain_description": "Primary screen heading: 'Flagship ANC Smart Headset'",
+          "form_field_type": null,
+          "suggested_test_value": null,
+          "bounds": {
+            "left": 60,
+            "top": 300,
+            "right": 1020,
+            "bottom": 420
+          },
+          "text": "Flagship ANC Smart Headset"
+        },
+        {
+          "element_id": "tv_detail_desc",
+          "role": "text",
+          "plain_description": "Text label: 'Industry-leading noise canceling with dual processors and 8 microphones for superior clear sound.'",
+          "form_field_type": null,
+          "suggested_test_value": null,
+          "bounds": {
+            "left": 60,
+            "top": 450,
+            "right": 1020,
+            "bottom": 700
+          },
+          "text": "Industry-leading noise canceling with dual processors and 8 microphones for superior clear sound."
+        },
+        {
+          "element_id": "btn_add_to_cart",
+          "role": "button",
+          "plain_description": "Interactive button: 'Add to Cart - $349.99'",
+          "form_field_type": null,
+          "suggested_test_value": null,
+          "bounds": {
+            "left": 80,
+            "top": 1900,
+            "right": 1000,
+            "bottom": 2050
+          },
+          "text": "Add to Cart - $349.99"
         }
       ]
     }

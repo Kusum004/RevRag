@@ -1,5 +1,5 @@
 import time
-from typing import List, Dict, Tuple, Optional
+from typing import List, Dict, Tuple, Optional, Set
 from common.models import Action, ActionType, ScreenState, TransitionEdge
 from layer1_instrumentation.base import IDeviceController
 from layer3_agent.frontier import ExplorationFrontierManager
@@ -9,6 +9,7 @@ class ExplorationAgent:
     """
     Autonomous Exploration Agent.
     Navigates an unfamiliar Android application without scripted paths,
+    prioritizes bottom navigation tabs and primary create flows (e.g. Post, My Network, Jobs),
     manages interactive frontiers, bypasses auth gates, recovers via backtracking,
     and logs transition triples (from_fp, action, to_fp).
     """
@@ -17,7 +18,7 @@ class ExplorationAgent:
         self,
         controller: IDeviceController,
         auth_handler: Optional[AuthGateHandler] = None,
-        step_budget: int = 30
+        step_budget: int = 35
     ):
         self.controller = controller
         self.auth_handler = auth_handler or AuthGateHandler()
@@ -25,7 +26,8 @@ class ExplorationAgent:
         self.frontier_mgr = ExplorationFrontierManager()
         self.transitions: List[TransitionEdge] = []
         self.screen_history: List[str] = []
-        self.handled_auth_screens: set[str] = set()
+        self.handled_auth_screens: Set[str] = set()
+        self.scrolled_screens: Set[str] = set()
 
     def explore(self) -> Tuple[Dict[str, ScreenState], List[TransitionEdge]]:
         """
@@ -59,7 +61,7 @@ class ExplorationAgent:
                         current_fp = next_state.fingerprint
                     continue
 
-            # 2. Pick next unexplored interactive element on current screen
+            # 2. Pick next unexplored interactive element on current screen (priority sorted)
             next_element = frontier.get_next_interactive_element()
 
             if next_element:
@@ -77,7 +79,7 @@ class ExplorationAgent:
                         action_type=ActionType.TAP,
                         target_element_id=next_element.element_id,
                         target_bounds=next_element.bounds,
-                        reason=f"Explore interactive element {next_element.element_id}"
+                        reason=f"Explore interactive element {next_element.element_id} ({next_element.text or next_element.content_desc or next_element.class_name})"
                     )
 
                 step += 1
@@ -91,14 +93,38 @@ class ExplorationAgent:
                 ))
 
             else:
-                # 3. No unexplored elements on this screen -> Backtrack
-                if consecutive_backtracks >= 4:
-                    # Trapped in deep loop or reached app root
+                # 3. No visible unexplored elements on this screen
+                # Check if we can scroll down to discover new items on feed/list screens
+                has_scrollable = any(el.scrollable for el in current_state.elements)
+                if has_scrollable and current_fp not in self.scrolled_screens:
+                    self.scrolled_screens.add(current_fp)
+                    scroll_action = Action(
+                        action_type=ActionType.SCROLL,
+                        direction="down",
+                        reason="Scroll down to reveal undiscovered content and tab items"
+                    )
+                    step += 1
+                    self.controller.perform_action(scroll_action)
+                    resulting_state = self.controller.get_screen_state()
+                    self.transitions.append(TransitionEdge(
+                        from_fingerprint=current_fp,
+                        action=scroll_action,
+                        to_fingerprint=resulting_state.fingerprint,
+                        timestamp=time.time()
+                    ))
+                    continue
+
+                # Check if all discovered frontiers are exhausted
+                all_exhausted = all(
+                    not f.has_unexplored_actions() for f in self.frontier_mgr.frontiers.values()
+                )
+                if consecutive_backtracks >= 8 or (consecutive_backtracks >= 3 and all_exhausted):
+                    # Fully explored accessible reachable graph or trapped
                     break
 
                 back_action = Action(
                     action_type=ActionType.BACK,
-                    reason="Backtrack to explore unvisited branches"
+                    reason="Backtrack to parent screen to explore unvisited branches/tabs"
                 )
                 step += 1
                 consecutive_backtracks += 1
@@ -112,3 +138,4 @@ class ExplorationAgent:
                 ))
 
         return self.frontier_mgr.discovered_screens, self.transitions
+

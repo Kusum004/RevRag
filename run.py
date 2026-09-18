@@ -214,7 +214,7 @@ def main():
     parser = argparse.ArgumentParser(description="RevRag Zero-Touch Live Android App Understanding Pipeline")
     parser.add_argument("--app", default="com.android.settings", help="Target real Android package name (e.g. com.android.settings, com.google.android.calculator)")
     parser.add_argument("--mode", default="adb", choices=["adb", "mock"], help="Primary controller mode ('adb' drives real emulator/hardware)")
-    parser.add_argument("--budget", type=int, default=25, help="Exploration step budget")
+    parser.add_argument("--budget", type=int, default=35, help="Exploration step budget")
     parser.add_argument("--stability", action="store_true", help="Run dual-pass repeat scan stability test")
     parser.add_argument("--viewer", action="store_true", help="Launch Streamlit viewer UI after exploration")
 

@@ -29,10 +29,25 @@ def parse_ui_hierarchy(xml_content: str, screen_width: int = 1080, screen_height
 
     elements: List[UIElement] = []
 
-    def traverse(node: ET.Element, depth: int):
+    # Interactive keywords for tabs, buttons, and actions
+    INTERACTIVE_KEYWORDS = {
+        "tab", "button", "nav", "network", "post", "jobs", "notification", 
+        "home", "feed", "menu", "search", "create", "add", "compose", "profile", "chat", "message"
+    }
+    INTERACTIVE_CLASSES = {
+        "android.widget.Button", "android.widget.ImageButton", "android.widget.TabWidget",
+        "android.widget.ImageView", "android.widget.TextView", "android.view.ViewGroup",
+        "android.widget.FrameLayout", "android.widget.LinearLayout", "android.widget.RelativeLayout"
+    }
+
+    def traverse(node: ET.Element, depth: int, parent_clickable: bool = False):
         attrib = node.attrib
         bounds_str = attrib.get("bounds", "")
         bounds = parse_bounds(bounds_str)
+
+        node_clickable = attrib.get("clickable", "false").lower() == "true"
+        # Propagate clickability if parent or self is clickable
+        is_clickable = node_clickable or parent_clickable
 
         # Basic visibility check
         if bounds and bounds.width > 0 and bounds.height > 0:
@@ -43,10 +58,17 @@ def parse_ui_hierarchy(xml_content: str, screen_width: int = 1080, screen_height
                 resource_id = html.unescape(attrib.get("resource-id", "")) or None
                 text = html.unescape(attrib.get("text", "")) or None
                 content_desc = html.unescape(attrib.get("content-desc", "")) or None
-                clickable = attrib.get("clickable", "false").lower() == "true"
                 editable = attrib.get("focused", "false").lower() == "true" or "EditText" in class_name
                 scrollable = attrib.get("scrollable", "false").lower() == "true"
+
+                # Check if this element represents a tab or action based on desc/text/id
+                combined_desc = f"{content_desc or ''} {text or ''} {resource_id or ''}".lower()
+                has_action_keyword = any(kw in combined_desc for kw in INTERACTIVE_KEYWORDS)
                 
+                # If it has action keywords or is in bottom navigation region, mark as clickable
+                if has_action_keyword or "button" in class_name.lower():
+                    is_clickable = True
+
                 # Derive readable element ID
                 clean_id = resource_id.split("/")[-1] if resource_id and "/" in resource_id else (resource_id or f"el_{len(elements)}")
 
@@ -57,7 +79,7 @@ def parse_ui_hierarchy(xml_content: str, screen_width: int = 1080, screen_height
                     text=text,
                     content_desc=content_desc,
                     bounds=bounds,
-                    clickable=clickable,
+                    clickable=is_clickable,
                     editable=editable,
                     scrollable=scrollable,
                     depth=depth,
@@ -66,7 +88,8 @@ def parse_ui_hierarchy(xml_content: str, screen_width: int = 1080, screen_height
                 elements.append(element)
 
         for child in node:
-            traverse(child, depth + 1)
+            traverse(child, depth + 1, parent_clickable=is_clickable)
 
-    traverse(root, 0)
+    traverse(root, 0, parent_clickable=False)
     return elements
+
