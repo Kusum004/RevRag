@@ -37,7 +37,7 @@ class AppDesignSystem(BaseModel):
 def synthesize_tone_of_voice_with_groq(
     corpus_text: str,
     api_key: Optional[str] = None,
-    model: str = "llama-3.3-70b-versatile",
+    model: str = "qwen/qwen3.8-27b",
     max_retries: int = 3
 ) -> str:
     """

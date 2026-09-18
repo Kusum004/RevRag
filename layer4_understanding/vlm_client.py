@@ -23,7 +23,7 @@ class VlmScreenAnalyzer:
         self,
         provider: str = "groq",
         api_key: Optional[str] = None,
-        model: str = "qwen/qwen3.6-27b"
+        model: str = "qwen/qwen3.8-27b"
     ):
         self.provider = provider
         self.model = model
@@ -62,7 +62,7 @@ class VlmScreenAnalyzer:
 
     def _call_groq_multimodal(self, screen_state: ScreenState, max_retries: int = 3) -> ScreenUnderstanding:
         """
-        Invokes Groq's multimodal vision model (qwen/qwen3.6-27b) with grounded screenshot + UI tree.
+        Invokes Groq's multimodal vision model (qwen/qwen3.8-27b / qwen/qwen3.6-27b) with grounded screenshot + UI tree.
         Features self-correction on schema failure and exponential backoff on 429 rate limits.
         """
         # 1. Prepare compact, token-efficient UI tree summary
@@ -83,12 +83,16 @@ class VlmScreenAnalyzer:
 
         ui_tree_json = json.dumps(compact_tree, separators=(',', ':'))
 
-        # 2. Encode screenshot as base64 data URI
-        if screen_state.screenshot_bytes and len(screen_state.screenshot_bytes) > 50:
+        # 2. Encode screenshot as base64 data URI (guaranteeing >= 32px dimensions required by Groq)
+        if screen_state.screenshot_bytes and len(screen_state.screenshot_bytes) > 200:
             b64_img = base64.b64encode(screen_state.screenshot_bytes).decode("utf-8")
         else:
-            # Minimal 1x1 transparent PNG fallback if screenshot failed
-            b64_img = "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII="
+            import io
+            from PIL import Image
+            dummy = Image.new("RGB", (100, 100), color=(20, 24, 39))
+            buf = io.BytesIO()
+            dummy.save(buf, format="PNG")
+            b64_img = base64.b64encode(buf.getvalue()).decode("utf-8")
 
         base_prompt = f"""
 You are an autonomous reverse-engineering AI perception engine for mobile applications.

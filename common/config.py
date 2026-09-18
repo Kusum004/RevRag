@@ -3,18 +3,22 @@ from pathlib import Path
 from typing import Optional
 from pydantic import BaseModel, Field
 
-# Load .env file automatically if present
-try:
-    from dotenv import load_dotenv
-    load_dotenv()
-except ImportError:
-    pass
-
 # Base Directory Paths
 BASE_DIR = Path(__file__).resolve().parent.parent
 OUTPUT_DIR = BASE_DIR / "output"
 OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
 TESTS_DIR = BASE_DIR / "tests"
+
+# Load .env file automatically if present in project root
+try:
+    from dotenv import load_dotenv
+    env_paths = [BASE_DIR / ".env", BASE_DIR / ".pytest_cache" / ".env", Path.cwd() / ".env"]
+    for ep in env_paths:
+        if ep.is_file():
+            load_dotenv(dotenv_path=ep)
+            break
+except ImportError:
+    pass
 
 # ADB Discovery Paths
 COMMON_ADB_PATHS = [
