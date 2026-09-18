@@ -1,270 +1,270 @@
 import os
 import json
 import base64
-import re
+import time
 from typing import Optional, Dict, Any, List
 from pydantic import ValidationError
+from common.config import get_groq_api_key
 from common.models import ScreenState, UIElement
+from common.groq_audit import log_groq_call
 from layer4_understanding.schema import ScreenUnderstanding, ElementSemantics
 
 class VlmScreenAnalyzer:
     """
-    Universal Multimodal Screen Understanding Engine.
-    Processes live screenshots and UI hierarchies of ANY unfamiliar Android application.
-    Extracts screen purpose, element roles, plain-language descriptions, and form semantics.
-    Enforces strict JSON schema validation.
+    Production Multimodal Screen Understanding Engine powered by Groq.
+    Grounds live screenshot pixels and compact Android UIAutomator hierarchies together
+    using Groq's high-speed vision model (qwen/qwen3.6-27b).
+
+    Enforces strict Pydantic schema validation, structural fingerprint caching,
+    exponential backoff rate-limit recovery, and self-correcting validation retry loops.
     """
 
-    def __init__(self, provider: str = "auto", api_key: Optional[str] = None):
+    def __init__(
+        self,
+        provider: str = "groq",
+        api_key: Optional[str] = None,
+        model: str = "qwen/qwen3.6-27b"
+    ):
         self.provider = provider
-        self.api_key = api_key or os.getenv("GEMINI_API_KEY") or os.getenv("OPENAI_API_KEY")
+        self.model = model
+        self.cache: Dict[str, ScreenUnderstanding] = {}
+        
+        if self.provider == "groq":
+            self.api_key = api_key or get_groq_api_key(required=True)
+            from groq import Groq
+            self.client = Groq(api_key=self.api_key)
+        elif self.provider == "offline_heuristic":
+            # Explicitly preserved only as an offline test fixture for unit tests
+            self.api_key = None
+            self.client = None
+        else:
+            raise ValueError(f"Unsupported provider '{provider}'. Use 'groq' for production AI inference or 'offline_heuristic' for unit testing.")
 
-    def analyze_screen(self, screen_state: ScreenState, max_retries: int = 2) -> ScreenUnderstanding:
+    def analyze_screen(self, screen_state: ScreenState, max_retries: int = 3) -> ScreenUnderstanding:
         """
-        Analyzes live screen state using configured LLM/VLM provider or dynamic multimodal inference.
+        Analyzes live Android screen state.
+        Checks fingerprint cache first to eliminate duplicate API requests.
         """
-        for attempt in range(max_retries + 1):
+        fp = screen_state.fingerprint
+        if fp in self.cache:
+            return self.cache[fp]
+
+        # Unit test offline fixture path
+        if self.provider == "offline_heuristic":
+            result = self._offline_heuristic_test_fixture(screen_state)
+            self.cache[fp] = result
+            return result
+
+        # Production Real Groq Multimodal AI Inference
+        result = self._call_groq_multimodal(screen_state, max_retries=max_retries)
+        self.cache[fp] = result
+        return result
+
+    def _call_groq_multimodal(self, screen_state: ScreenState, max_retries: int = 3) -> ScreenUnderstanding:
+        """
+        Invokes Groq's multimodal vision model (qwen/qwen3.6-27b) with grounded screenshot + UI tree.
+        Features self-correction on schema failure and exponential backoff on 429 rate limits.
+        """
+        # 1. Prepare compact, token-efficient UI tree summary
+        compact_tree = []
+        for el in screen_state.elements[:40]:
+            item = {
+                "id": el.element_id,
+                "class": el.class_name.split(".")[-1],
+                "bounds": [el.bounds.left, el.bounds.top, el.bounds.right, el.bounds.bottom] if el.bounds else None,
+                "clickable": el.clickable,
+                "editable": el.editable
+            }
+            if el.text:
+                item["text"] = el.text[:60]
+            if el.content_desc:
+                item["desc"] = el.content_desc[:60]
+            compact_tree.append(item)
+
+        ui_tree_json = json.dumps(compact_tree, separators=(',', ':'))
+
+        # 2. Encode screenshot as base64 data URI
+        if screen_state.screenshot_bytes and len(screen_state.screenshot_bytes) > 50:
+            b64_img = base64.b64encode(screen_state.screenshot_bytes).decode("utf-8")
+        else:
+            # Minimal 1x1 transparent PNG fallback if screenshot failed
+            b64_img = "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII="
+
+        base_prompt = f"""
+You are an autonomous reverse-engineering AI perception engine for mobile applications.
+Analyze this Android application screen by grounding the visual screenshot together with the UI hierarchy tree.
+Extract the true screen purpose, visual element semantics, and form field classifications even if developer labels are absent or cryptic.
+
+Required JSON Output Schema:
+{{
+  "fingerprint": "{screen_state.fingerprint}",
+  "screen_name": "Short human-friendly title of the screen (e.g. Login Screen, Network Hub, Post Composer, Settings)",
+  "purpose": "Exactly one clear sentence describing the primary purpose of this screen.",
+  "screen_category": "onboarding | authentication | catalog | product_detail | checkout | profile | kyc | settings | general_view",
+  "key_actions": ["Primary action 1", "Primary action 2"],
+  "elements": [
+    {{
+      "element_id": "Exact matching element ID from the UI tree",
+      "role": "button | text_input | heading | icon | card | tab | badge | image",
+      "plain_description": "Plain language explanation grounded in visual appearance and context",
+      "form_field_type": "phone | otp | email | password | pan | aadhaar | search | quantity | address | null"
+    }}
+  ]
+}}
+
+Live Android UI Tree Context:
+{ui_tree_json}
+"""
+
+        current_prompt = base_prompt
+        last_error = None
+
+        for attempt in range(max_retries):
+            start_time = time.time()
             try:
-                if self.provider == "gemini" and self.api_key:
-                    raw_dict = self._call_gemini(screen_state)
-                elif self.provider == "openai" and self.api_key:
-                    raw_dict = self._call_openai(screen_state)
-                else:
-                    raw_dict = self._dynamically_infer_screen_semantics(screen_state)
+                # Construct Groq multimodal message payload
+                messages = [
+                    {
+                        "role": "user",
+                        "content": [
+                            {"type": "text", "text": current_prompt},
+                            {
+                                "type": "image_url",
+                                "image_url": {
+                                    "url": f"data:image/png;base64,{b64_img}"
+                                }
+                            }
+                        ]
+                    }
+                ]
 
-                validated = ScreenUnderstanding.model_validate(raw_dict)
+                response = self.client.chat.completions.create(
+                    model=self.model,
+                    messages=messages,
+                    response_format={"type": "json_object"},
+                    temperature=0.1,
+                    max_tokens=2048
+                )
+
+                latency_ms = (time.time() - start_time) * 1000
+                raw_text = response.choices[0].message.content or "{}"
+                parsed_json = json.loads(raw_text)
+
+                # Ensure fingerprint is preserved
+                parsed_json["fingerprint"] = screen_state.fingerprint
+
+                # Validate against strict Pydantic schema
+                validated = ScreenUnderstanding.model_validate(parsed_json)
+
+                # Auditable API call logging
+                log_groq_call(
+                    layer="Layer 4 (Screen Understanding)",
+                    model=self.model,
+                    latency_ms=latency_ms,
+                    input_summary={"screen_fp": screen_state.fingerprint, "elements_count": len(screen_state.elements)},
+                    output_summary={"screen_name": validated.screen_name, "category": validated.screen_category, "elements_identified": len(validated.elements)},
+                    status="success"
+                )
+
                 return validated
-            except (ValidationError, Exception):
-                if attempt == max_retries:
-                    fallback_dict = self._dynamically_infer_screen_semantics(screen_state)
-                    return ScreenUnderstanding.model_validate(fallback_dict)
 
-        return ScreenUnderstanding.model_validate(self._dynamically_infer_screen_semantics(screen_state))
+            except ValidationError as ve:
+                last_error = f"Schema ValidationError: {ve}"
+                # Append validation error for self-correction in next attempt
+                current_prompt = base_prompt + f"\n\nCRITICAL FIX REQUIRED: Your previous JSON response failed validation:\n{ve}\nRegenerate strictly valid JSON."
+                time.sleep(1.0)
 
-    def _dynamically_infer_screen_semantics(self, screen_state: ScreenState) -> Dict[str, Any]:
+            except Exception as e:
+                last_error = str(e)
+                # Check for rate-limit 429
+                is_rate_limit = "429" in str(e) or "rate" in str(e).lower()
+                sleep_sec = (2 ** attempt) * 2.0 if is_rate_limit else 1.5
+                time.sleep(sleep_sec)
+
+        # Log failure if all retries exhausted
+        log_groq_call(
+            layer="Layer 4 (Screen Understanding)",
+            model=self.model,
+            latency_ms=0.0,
+            input_summary={"screen_fp": screen_state.fingerprint},
+            output_summary={},
+            status="failed",
+            error_message=last_error
+        )
+
+        # Surface clear error and flagged incomplete screen profile (never silently substitute hardcoded guess)
+        return ScreenUnderstanding(
+            fingerprint=screen_state.fingerprint,
+            screen_name="Flagged Screen (Incomplete Inference)",
+            purpose=f"Flagged for manual review: Groq vision inference failed after {max_retries} attempts ({last_error}).",
+            screen_category="general_view",
+            elements=[],
+            key_actions=[]
+        )
+
+    def _offline_heuristic_test_fixture(self, screen_state: ScreenState) -> ScreenUnderstanding:
         """
-        100% Dynamic Semantic Engine for Unfamiliar Android Apps.
-        Zero hardcoded app screens or static copy.
-        Examines live element positions, classes, resource-ids, and visible text tokens.
+        EXPLICITLY LABELED OFFLINE TEST FIXTURE.
+        Used strictly in unit testing (tests/test_layer4.py) to prevent external network requirements.
+        Never called in production exploration.
         """
         elements = screen_state.elements
-        elements_semantics: List[Dict[str, Any]] = []
-
-        # 1. Dynamically Detect Screen Name
         screen_name = "Application Screen"
-        # Strategy A: Check top action bar or toolbar TextView
+        screen_category = "general_view"
+        purpose = "Allows users to view and interact with application features."
+
         for el in elements:
-            if "TextView" in el.class_name and el.bounds.top < 350 and el.text:
-                res_id = (el.resource_id or "").lower()
-                if any(t in res_id for t in ["title", "header", "toolbar", "action_bar", "heading", "name"]):
-                    screen_name = el.text.strip()
-                    break
-        # Strategy B: If not found, look for first prominent text in top third
-        if screen_name == "Application Screen":
-            for el in elements:
-                if el.text and len(el.text.strip()) > 2 and el.bounds.top < 600:
-                    screen_name = el.text.strip().title()
-                    break
-        # Strategy C: Derive from activity name if available
-        if screen_name == "Application Screen" and screen_state.activity_name:
-            act = screen_state.activity_name.split(".")[-1].replace("Activity", "")
-            if act:
-                screen_name = re.sub(r'([a-z])([A-Z])', r'\1 \2', act).title()
+            if "TextView" in el.class_name and el.bounds and el.bounds.top < 350 and el.text:
+                screen_name = el.text.strip().title()
+                break
 
-        # 2. Analyze Interactive Composition & Classify Screen Category
-        has_text_inputs = any(el.editable for el in elements)
-        has_toggles = any("Switch" in el.class_name or "CheckBox" in el.class_name or "toggle" in (el.resource_id or "").lower() for el in elements)
-        has_cards = any("CardView" in el.class_name or "card" in (el.resource_id or "").lower() for el in elements)
-        has_tabs = any("tab" in (el.resource_id or "").lower() or ("FrameLayout" in el.class_name and el.bounds.top > 1800) for el in elements)
+        all_text = " ".join([el.text or "" for el in elements] + [el.content_desc or "" for el in elements]).lower()
 
-        all_text_tokens = " ".join(
-            [(el.text or "") for el in elements] +
-            [(el.content_desc or "") for el in elements] +
-            [(el.resource_id or "") for el in elements]
-        ).lower()
-
-        if any(w in all_text_tokens for w in ["login", "sign in", "otp", "password", "enter mobile", "phone number"]):
+        if any(w in all_text for w in ["login", "sign in", "password", "enter phone", "otp"]):
             screen_category = "authentication"
-        elif any(w in all_text_tokens for w in ["setting", "preferences", "bluetooth", "wifi", "network", "display", "sound", "storage"]):
-            screen_category = "settings"
-        elif any(w in all_text_tokens for w in ["pan", "aadhaar", "kyc", "identity", "ssn", "tax id", "verification"]):
-            screen_category = "identity_verification"
-        elif any(w in all_text_tokens for w in ["cart", "checkout", "buy now", "add to cart", "price", "subtotal"]):
-            screen_category = "product_checkout"
-        elif any(w in all_text_tokens for w in ["welcome", "get started", "onboarding", "intro", "next"]):
+            screen_name = "Login Screen"
+            purpose = "Authenticates the user into the mobile application using phone or credentials."
+        elif any(w in all_text for w in ["welcome", "get started", "onboarding"]):
             screen_category = "onboarding"
-        elif has_toggles or "preference" in all_text_tokens:
+            screen_name = "Splash / Onboarding Screen"
+            purpose = "Introduces new users to the features and entry flow of the application."
+        elif any(w in all_text for w in ["settings", "preferences"]):
             screen_category = "settings"
-        elif has_cards or "search" in all_text_tokens or "catalog" in all_text_tokens:
-            screen_category = "catalog_browsing"
-        elif has_text_inputs:
-            screen_category = "form_entry"
-        else:
-            screen_category = "general_view"
+            screen_name = "Settings"
+            purpose = "Provides application and system configuration controls."
 
-        # 3. Formulate Dynamic 1-Sentence Purpose
-        primary_clickable = [el.text or el.content_desc or el.element_id for el in elements if el.clickable and el.text][:3]
-        action_summary = f"including '{', '.join(primary_clickable)}'" if primary_clickable else "available on the interface"
-
-        if screen_category == "authentication":
-            purpose = f"Authenticates the user into the application using mobile, email, or credentials ({screen_name})."
-        elif screen_category == "settings":
-            purpose = f"Provides system and application configuration controls for {screen_name}."
-        elif screen_category == "catalog_browsing":
-            purpose = f"Displays content items, categories, and interactive options for {screen_name}."
-        elif screen_category == "onboarding":
-            purpose = f"Introduces new users to the features and entry flow of {screen_name}."
-        elif screen_category == "identity_verification":
-            purpose = f"Collects verification identity information for user compliance ({screen_name})."
-        else:
-            purpose = f"Allows users to view and interact with {screen_name} features {action_summary}."
-
-        # 4. Extract Per-Element Semantics Dynamically
-        key_actions: List[str] = []
+        elements_semantics: List[ElementSemantics] = []
         for el in elements:
-            res_id = (el.resource_id or "").lower()
-            txt = (el.text or "").lower()
-            cls = el.class_name.lower()
-            cdesc = (el.content_desc or "").lower()
-
-            role = "view"
-            form_type = None
-            desc = "UI visual component"
-
-            if el.editable or "edittext" in cls:
+            token_str = f"{el.text or ''} {el.content_desc or ''} {el.element_id or ''}".lower()
+            if el.editable or "edittext" in el.class_name.lower():
                 role = "text_input"
-                if any(w in res_id or w in txt or w in cdesc for w in ["phone", "mobile", "number"]):
-                    form_type = "phone"
-                    desc = f"Input field for entering phone or mobile number ({el.text or 'empty'})"
-                elif any(w in res_id or w in txt or w in cdesc for w in ["otp", "code", "pin", "verify"]):
-                    form_type = "otp"
-                    desc = f"Input field for verification code or OTP"
-                elif any(w in res_id or w in txt or w in cdesc for w in ["email", "mail"]):
-                    form_type = "email"
-                    desc = f"Input field for user email address"
-                elif any(w in res_id or w in txt or w in cdesc for w in ["password", "passwd", "secret"]):
-                    form_type = "password"
-                    desc = f"Secure password input field"
-                elif any(w in res_id or w in txt or w in cdesc for w in ["pan", "tax"]):
-                    form_type = "pan"
-                    desc = f"Input field for permanent account / tax identity"
-                elif any(w in res_id or w in txt or w in cdesc for w in ["aadhaar", "ssn", "identity"]):
-                    form_type = "aadhaar"
-                    desc = f"Input field for national identity number"
-                elif any(w in res_id or w in txt or w in cdesc for w in ["search", "query", "find"]):
-                    form_type = "search"
-                    desc = f"Search input field for querying content"
-                else:
-                    form_type = "text"
-                    desc = f"Editable text field: '{el.text or el.element_id}'"
-
-                key_actions.append(f"Input text into {form_type or 'field'} ({el.element_id})")
-
-            elif "switch" in cls or "checkbox" in cls:
-                role = "toggle"
-                desc = f"Toggle switch control: {el.text or el.content_desc or el.element_id}"
-                key_actions.append(f"Toggle {el.element_id}")
-
-            elif el.clickable or "button" in cls:
+            elif el.clickable or "button" in el.class_name.lower():
                 role = "button"
-                desc = f"Interactive button: '{el.text or el.content_desc or el.element_id}'"
-                if el.text:
-                    key_actions.append(f"Tap '{el.text}'")
+            else:
+                role = "heading" if (el.bounds and el.bounds.top < 350) else "text"
 
-            elif "image" in cls:
-                role = "image"
-                desc = f"Image or icon asset ({el.content_desc or 'graphic'})"
+            form_type = None
+            if any(w in token_str for w in ["phone", "mobile"]):
+                form_type = "phone"
+            elif any(w in token_str for w in ["otp", "code", "pin"]):
+                form_type = "otp"
+            elif "email" in token_str:
+                form_type = "email"
+            elif "password" in token_str:
+                form_type = "password"
 
-            elif "cardview" in cls:
-                role = "card"
-                desc = f"Interactive content container card"
+            elements_semantics.append(ElementSemantics(
+                element_id=el.element_id,
+                role=role,
+                plain_description=f"UI element {el.text or el.content_desc or el.element_id}",
+                form_field_type=form_type
+            ))
 
-            elif "framelayout" in cls and el.bounds.top > 1800:
-                role = "tab"
-                desc = f"Navigation tab item: '{el.text or el.content_desc or el.element_id}'"
-
-            elif "textview" in cls:
-                if el.bounds.top < 350 and el.bounds.height > 50:
-                    role = "heading"
-                    desc = f"Primary screen heading: '{el.text}'"
-                else:
-                    role = "text"
-                    desc = f"Text label: '{el.text}'"
-
-            elements_semantics.append({
-                "element_id": el.element_id,
-                "role": role,
-                "plain_description": desc,
-                "form_field_type": form_type,
-                "suggested_test_value": None
-            })
-
-        return {
-            "fingerprint": screen_state.fingerprint,
-            "screen_name": screen_name,
-            "purpose": purpose,
-            "screen_category": screen_category,
-            "elements": elements_semantics,
-            "key_actions": key_actions[:5]
-        }
-
-    def _call_gemini(self, screen_state: ScreenState) -> Dict[str, Any]:
-        from google import genai
-        from google.genai import types
-
-        client = genai.Client(api_key=self.api_key)
-        prompt = f"""
-        You are an autonomous Android reverse-engineering perception system.
-        Analyze this screenshot and live UI element hierarchy of an unfamiliar Android application.
-        Output a strict JSON object:
-        {{
-            "fingerprint": "{screen_state.fingerprint}",
-            "screen_name": "Concise plain title of screen",
-            "purpose": "Exactly one sentence explaining what this screen does.",
-            "screen_category": "onboarding | authentication | catalog_browsing | settings | form_entry | general_view",
-            "key_actions": ["action 1", "action 2"],
-            "elements": [
-                {{
-                    "element_id": "string id matching hierarchy",
-                    "role": "button | text_input | toggle | heading | text | card | tab | image",
-                    "plain_description": "Plain language explanation grounded in visual screenshot",
-                    "form_field_type": "phone | otp | email | password | search | text | null"
-                }}
-            ]
-        }}
-        UI Elements tree:
-        {json.dumps([e.model_dump(exclude={'screenshot_bytes', 'raw_xml'}) for e in screen_state.elements], indent=2)}
-        """
-
-        contents = [prompt]
-        if screen_state.screenshot_bytes:
-            contents.append(types.Part.from_bytes(data=screen_state.screenshot_bytes, mime_type="image/png"))
-
-        response = client.models.generate_content(
-            model="gemini-2.5-flash",
-            contents=contents,
-            config=types.GenerateContentConfig(response_mime_type="application/json")
+        return ScreenUnderstanding(
+            fingerprint=screen_state.fingerprint,
+            screen_name=screen_name,
+            purpose=purpose,
+            screen_category=screen_category,
+            elements=elements_semantics,
+            key_actions=["Interact with screen controls"]
         )
-        return json.loads(response.text)
-
-    def _call_openai(self, screen_state: ScreenState) -> Dict[str, Any]:
-        from openai import OpenAI
-        client = OpenAI(api_key=self.api_key)
-
-        b64_image = base64.b64encode(screen_state.screenshot_bytes or b"").decode("utf-8")
-        prompt = f"Analyze this Android screen hierarchy: {json.dumps([e.model_dump() for e in screen_state.elements])}"
-
-        messages = [
-            {"role": "system", "content": "You are a UI reverse engineering analyzer. Return valid JSON only."},
-            {"role": "user", "content": [
-                {"type": "text", "text": prompt},
-                {"type": "image_url", "image_url": {"url": f"data:image/png;base64,{b64_image}"}}
-            ]}
-        ]
-
-        response = client.chat.completions.create(
-            model="gpt-4o",
-            messages=messages,
-            response_format={"type": "json_object"}
-        )
-        return json.loads(response.choices[0].message.content or "{}")

@@ -24,7 +24,7 @@ def test_full_design_system_extraction():
         controller.current_screen_id = scr_id
         screens.append(controller.get_screen_state())
         
-    ds = extract_design_system(screens)
+    ds = extract_design_system(screens, offline_test_fixture=True)
     
     assert isinstance(ds, AppDesignSystem)
     assert ds.spacing.base_grid_unit_dp == 8

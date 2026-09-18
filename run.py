@@ -26,7 +26,7 @@ if hasattr(sys.stdout, "reconfigure"):
     except Exception:
         pass
 
-from common.config import OUTPUT_DIR, AppConfig, get_adb_path
+from common.config import OUTPUT_DIR, AppConfig, get_adb_path, get_groq_api_key
 from layer1_instrumentation.adb_controller import AdbDeviceController
 from layer3_agent.auth_handler import AuthGateHandler
 from layer3_agent.explorer import ExplorationAgent
@@ -59,17 +59,23 @@ def check_connected_adb_devices() -> list[str]:
 def run_pipeline(
     package_name: str = "com.android.settings",
     mode: str = "adb",
-    step_budget: int = 30,
+    step_budget: int = 35,
     output_dir: Path = OUTPUT_DIR,
-    run_stability: bool = False
+    run_stability: bool = False,
+    offline_test: bool = False
 ) -> AppKnowledgePack:
     output_dir.mkdir(parents=True, exist_ok=True)
 
+    # Enforce GROQ_API_KEY validation at startup when running in real AI mode
+    if mode == "adb" and not offline_test:
+        get_groq_api_key(required=True)
+
     console.print(Panel(
         f"[bold cyan]RevRag In-App Agent: Zero-Touch App Understanding[/bold cyan]\n"
-        f"[dim]Target Real App: [bold white]{package_name}[/bold white] | Controller: [bold green]{mode.upper()}[/bold green] | Budget: {step_budget} steps[/dim]",
+        f"[dim]Target Real App: [bold white]{package_name}[/bold white] | Controller: [bold green]{mode.upper()}[/bold green] | AI: [bold magenta]{'Groq (qwen/qwen3.6-27b + llama-3.3-70b)' if not offline_test else 'Offline Test Heuristic'}[/bold magenta] | Budget: {step_budget} steps[/dim]",
         border_style="cyan"
     ))
+
 
     # 1. Initialize Instrumentation Layer against Real Device
     console.print("[bold green][>] Step 1/6:[/bold green] Connecting to Android Device/Emulator via ADB...")
@@ -137,19 +143,21 @@ def run_pipeline(
             with open(sc_path, "wb") as f:
                 f.write(s.screenshot_bytes)
 
-    # 3. Multimodal Screen Understanding (Zero hardcoded app data)
-    console.print("[bold green][>] Step 3/6:[/bold green] Dynamically Analyzing Discovered Screens & Form Fields...")
-    analyzer = VlmScreenAnalyzer(provider="offline_heuristic")
+    # 3. Multimodal Screen Understanding via Groq Vision (qwen/qwen3.6-27b)
+    console.print("[bold green][>] Step 3/6:[/bold green] Analyzing Screens with Groq Multimodal Vision AI ([bold cyan]qwen/qwen3.6-27b[/bold cyan])...")
+    provider = "groq" if mode == "adb" and not offline_test else "offline_heuristic"
+    analyzer = VlmScreenAnalyzer(provider=provider)
     understandings = {}
     for fp, s in screens.items():
         und = analyzer.analyze_screen(s)
         understandings[fp] = und
-        console.print(f"  [dim]  * [{und.screen_category.upper()}] '{und.screen_name}' -> Purpose: {und.purpose}[/dim]")
+        console.print(f"  [cyan][+] [AI Vision: {und.screen_category.upper()}][/cyan] '{und.screen_name}' -> [white]{und.purpose}[/white]")
 
-    # 4. Extract Brand & Design System from Real Pixels & Hierarchy
-    console.print("[bold green][>] Step 4/6:[/bold green] Extracting Live Brand Colors, Spacing & Tone of Voice...")
-    design_system = extract_design_system(list(screens.values()))
-    console.print(f"  [dim]  * Theme: {'Dark' if design_system.palette.is_dark_mode else 'Light'} | Primary: {design_system.palette.primary_accent} | Tone: {design_system.tone_of_voice}[/dim]")
+    # 4. Extract Brand & Design System from Real Pixels & Copy (llama-3.3-70b-versatile)
+    console.print("[bold green][>] Step 4/6:[/bold green] Extracting Brand Colors, Spacing & Synthesizing Tone of Voice ([bold cyan]llama-3.3-70b-versatile[/bold cyan])...")
+    design_system = extract_design_system(list(screens.values()), offline_test_fixture=(provider == "offline_heuristic"))
+    console.print(f"  [cyan][+] Theme: {'Dark' if design_system.palette.is_dark_mode else 'Light'} | Primary: {design_system.palette.primary_accent}[/cyan]")
+    console.print(f"  [cyan][+] Synthesized Tone of Voice: [bold white]\"{design_system.tone_of_voice}\"[/bold white][/cyan]")
 
     # 5. Build Deduplicated Directed Graph
     console.print("[bold green][>] Step 5/6:[/bold green] Compiling Deduplicated Journey Graph...")
@@ -216,6 +224,7 @@ def main():
     parser.add_argument("--mode", default="adb", choices=["adb", "mock"], help="Primary controller mode ('adb' drives real emulator/hardware)")
     parser.add_argument("--budget", type=int, default=35, help="Exploration step budget")
     parser.add_argument("--stability", action="store_true", help="Run dual-pass repeat scan stability test")
+    parser.add_argument("--offline-test", action="store_true", help="Run in offline mock test mode without calling Groq API")
     parser.add_argument("--viewer", action="store_true", help="Launch Streamlit viewer UI after exploration")
 
     args = parser.parse_args()
@@ -223,7 +232,8 @@ def main():
         package_name=args.app,
         mode=args.mode,
         step_budget=args.budget,
-        run_stability=args.stability
+        run_stability=args.stability,
+        offline_test=args.offline_test
     )
 
     if args.viewer:
