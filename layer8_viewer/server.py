@@ -68,7 +68,14 @@ if FRONTEND_DIST.exists():
             return FileResponse(str(index_file))
         raise HTTPException(status_code=404, detail="Frontend build index not found")
 
+# Safe UTF-8 stdout
+if hasattr(sys.stdout, "reconfigure"):
+    try:
+        sys.stdout.reconfigure(encoding="utf-8")
+    except Exception:
+        pass
+
 if __name__ == "__main__":
     import uvicorn
-    print("\n⚡ RevRag React + Tailwind Studio running at: http://localhost:8000\n")
+    print("\n[+] RevRag React + Tailwind Studio running at: http://localhost:8000\n")
     uvicorn.run(app, host="0.0.0.0", port=8000)
