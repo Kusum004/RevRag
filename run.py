@@ -227,9 +227,9 @@ def main():
     )
 
     if args.viewer:
-        console.print("[bold cyan]Launching Interactive Viewer UI...[/bold cyan]")
-        app_script = str(BASE_DIR / 'layer8_viewer' / 'app.py')
-        os.system(f'streamlit run "{app_script}"')
+        console.print("[bold cyan]Launching React + Tailwind Studio UI...[/bold cyan]")
+        server_script = str(BASE_DIR / 'layer8_viewer' / 'server.py')
+        os.system(f'python "{server_script}"')
 
 if __name__ == "__main__":
     main()
